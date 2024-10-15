@@ -45,20 +45,9 @@ export const focusOptions = [
 ];
 
 export const MODELS = [
-  { label: "gpt-4o", value: "gpt-4o" },
-  { label: "gpt-4-turbo-2024-04-09", value: "gpt-4-turbo-2024-04-09" },
-  { label: "gpt-4-turbo-preview", value: "gpt-4-turbo-preview" },
-  { label: "gpt-4-1106-review", value: "gpt-4-1106-review" },
-  { label: "gpt-4-0613", value: "gpt-4-0613" },
-  { label: "gpt-4-0125-preview", value: "gpt-4-0125-preview" },
-  { label: "gpt-4", value: "gpt-4" },
-  { label: "gpt-3.5-turbo-16k-0613", value: "gpt-3.5-turbo-16k-0613" },
-  { label: "gpt-3.5-turbo-16k", value: "gpt-3.5-turbo-16k" },
-  { label: "gpt-3.5-turbo-1106", value: "gpt-3.5-turbo-1106" },
-  { label: "gpt-3.5-turbo-0613", value: "gpt-3.5-turbo-0613" },
-  { label: "gpt-3.5-turbo-0301", value: "gpt-3.5-turbo-0301" },
-  { label: "gpt-3.5-turbo-0125", value: "gpt-3.5-turbo-0125" },
-  { label: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
+  { label: "llama3.2", value: "llama3.2" },
+  { label: "gemma2:9b", value: "gemma2:9b" },
+  { label: "mistral-nemo", value: "mistral-nemo" },
 ];
 
 export const PLUGINS = [

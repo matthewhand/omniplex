@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   const response = await openai.chat.completions.create({
     stream: true,
-    model: model,
+    model: model || "llama3.2",  // Use the env variable, fallback to llama3.2
     temperature: temperature,
     max_tokens: max_tokens,
     top_p: top_p,

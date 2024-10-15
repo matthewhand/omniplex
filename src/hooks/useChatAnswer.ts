@@ -77,7 +77,7 @@ const useChatAnswer = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages,
-          model: chat?.mode === "image" ? "gpt-4o" : ai.model,
+          model: chat?.mode === "image" ? "llama3.2" : ai.model,
           temperature: ai.temperature,
           max_tokens: ai.maxLength,
           top_p: ai.topP,
@@ -187,7 +187,7 @@ const useChatAnswer = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages,
-          model: lastChat.mode === "image" ? "gpt-4o" : ai.model,
+          model: lastChat.mode === "image" ? "llama3.2" : ai.model,
           temperature: ai.temperature,
           max_tokens: ai.maxLength,
           top_p: ai.topP,

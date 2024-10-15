@@ -135,7 +135,7 @@ const Settings = () => {
           <div className={styles.listRow}>
             <div className={styles.listHeader}>Model</div>
             <Tooltip
-              content="For Images, we only use GPT-4o"
+              content="For Images, we only use llama3.2"
               color={"warning"}
               placement={"bottom-end"}
               className={styles.tooltip}
