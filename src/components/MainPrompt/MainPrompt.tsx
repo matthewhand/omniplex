@@ -29,6 +29,9 @@ import Clip from "../../../public/svgs/Clip.svg";
 import Check from "../../../public/svgs/Check.svg";
 import CrossRed from "../../../public/svgs/CrossRed.svg";
 
+// Use environment variable to get the base URL
+const baseUrl = process.env.NEXT_PUBLIC_OPENWEBUI_BASE_URL;
+
 const MainPrompt = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -38,11 +41,44 @@ const MainPrompt = () => {
   const userDetails = useSelector(selectUserDetailsState);
   const userId = userDetails.uid;
 
+  // State for prompt suggestions and input text
+  const [prompts, setPrompts] = useState([]);
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Fetch prompt suggestions from the OpenWebUI API when component mounts
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      setLoading(true);
+      console.log("Fetching prompt suggestions...");  // Log when fetch starts
+      try {
+        const response = await fetch(`${baseUrl}`);
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("API response data:", data);  // Log the full response
+        console.log("Prompt suggestions:", data.default_prompt_suggestions);  // Log the suggestions
+        setPrompts(data.default_prompt_suggestions || []);
+      } catch (error) {
+        console.error("Error fetching prompt suggestions from OpenWebUI:", error);
+      } finally {
+        setLoading(false);
+        console.log("Fetch complete.");  // Log when fetch completes
+      }
+    };
+
+    fetchPrompts();
+  }, []);
+
+  // Handle clicking a prompt button
+  const handlePromptSelect = (content: string) => {
+    setText(content);  // Populate input with the selected prompt (long description)
+  };
+
   const [width, setWidth] = useState(0);
   const [modal, setModal] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<Mode>("");
+  const [mode, setMode] = useState<Mode>("chat");
   const [buttonText, setButtonText] = useState("Attach");
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [open, setOpen] = useState(false);
@@ -126,7 +162,6 @@ const MainPrompt = () => {
     if (event.key === "Enter" && !event.shiftKey && text.trim() !== "") {
       event.preventDefault();
       handleSend();
-    } else if (event.key === "Enter" && event.shiftKey) {
     }
   };
 
@@ -234,7 +269,7 @@ const MainPrompt = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>Where Knowledge Evolves</div>
+      <div className={styles.title}>Infinite Knowledge</div>
       <div className={styles.promptContainer}>
         <textarea
           placeholder="Ask anything..."
@@ -243,6 +278,38 @@ const MainPrompt = () => {
           onChange={handleInput}
           onKeyDown={handleEnter}
         />
+        {/* Show a loading message while fetching */}
+        {loading && <p>Loading suggestions...</p>}
+
+        {/* Render prompt suggestions as buttons */}
+        {prompts.length > 0 ? (
+        <div>
+          {prompts.map((prompt, index) => (
+            <button
+  key={index}
+  onClick={() => handlePromptSelect(prompt.content)}
+  style={{
+    padding: '12px 20px',
+    margin: '10px 5px',
+    borderRadius: '12px',
+    backgroundColor: '#f0f0f0',
+    border: '2px solid #ddd',
+    color: '#333',
+    fontSize: '16px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.3s ease-in-out',
+  }}
+>
+  {prompt.title[0]}
+</button>
+          ))}
+        </div>
+      ) : (
+        <p>No prompt suggestions available.</p>
+      )}
+
         <div className={styles.mainRow}>
           <div className={styles.sectionRow}>
             {width <= 512 && (
