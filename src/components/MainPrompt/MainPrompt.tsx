@@ -32,6 +32,8 @@ import CrossRed from "../../../public/svgs/CrossRed.svg";
 // Use environment variable to get the base URL
 const baseUrl = process.env.NEXT_PUBLIC_OPENWEBUI_BASE_URL;
 
+type PromptSuggestion = { title: string[]; content: string };
+
 const MainPrompt = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -42,7 +44,7 @@ const MainPrompt = () => {
   const userId = userDetails.uid;
 
   // State for prompt suggestions and input text
-  const [prompts, setPrompts] = useState([]);
+  const [prompts, setPrompts] = useState<PromptSuggestion[]>([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 

@@ -79,7 +79,7 @@ ANTHROPIC_API_KEY=******
 
 ```ts
 import Anthropic from "@anthropic-ai/sdk";
-import { OpenAIStream, StreamingTextResponse } from "ai";
+import { textStreamResponse } from "@/utils/textStreamResponse";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -107,10 +107,17 @@ export async function POST(req: Request) {
     frequency_penalty: frequency_penalty,
     presence_penalty: presence_penalty,
     messages: messages,
-  });
+  }, { signal: req.signal });
 
-  const stream = OpenAIStream(response);
-  return new StreamingTextResponse(stream);
+  async function* text() {
+    for await (const event of response) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        yield event.delta.text;
+      }
+    }
+  }
+
+  return textStreamResponse(text(), () => response.controller.abort());
 }
 ```
 

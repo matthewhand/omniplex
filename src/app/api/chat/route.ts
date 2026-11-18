@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { OpenAIStream, StreamingTextResponse } from "ai";
+import { textStreamResponse } from "@/utils/textStreamResponse";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -27,8 +27,14 @@ export async function POST(req: Request) {
     frequency_penalty: frequency_penalty,
     presence_penalty: presence_penalty,
     messages: messages,
-  });
+  }, { signal: req.signal });
 
-  const stream = OpenAIStream(response);
-  return new StreamingTextResponse(stream);
+  async function* text() {
+    for await (const chunk of response) {
+      const content = chunk.choices[0]?.delta.content;
+      if (content) yield content;
+    }
+  }
+
+  return textStreamResponse(text(), () => response.controller.abort());
 }

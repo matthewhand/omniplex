@@ -1,0 +1,39 @@
+name: Dependency checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      OPENAI_API_KEY: fixture-only
+      NEXT_PUBLIC_FIREBASE_API_KEY: fixture-only
+      FIREBASE_PROJECT_ID: demo-omniplex
+      FIREBASE_STORAGE_BUCKET: demo-omniplex.test
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: corepack enable && corepack prepare yarn@1.22.22 --activate
+      - run: yarn install --frozen-lockfile
+      - run: node --experimental-strip-types --test tests/text-stream.test.mjs
+      - run: yarn lint
+      - run: yarn build
+      - name: Check the built application
+        run: |
+          node_modules/.bin/next start --hostname 127.0.0.1 --port 3000 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:3000/robots.txt > /dev/null
+          node --test tests/routes.test.mjs
